@@ -1,4 +1,4 @@
-import { createCheckout } from '../server/billing'
-import { withBilling } from '../server/stripe'
+import { createCheckout } from '../server/billing.js'
+import { withBilling } from '../server/stripe.js'
 
 export const POST = withBilling(createCheckout)

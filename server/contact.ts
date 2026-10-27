@@ -1,4 +1,4 @@
-import { json } from './billing'
+import { json } from './billing.js'
 
 export interface ContactEnv {
   resendApiKey?: string

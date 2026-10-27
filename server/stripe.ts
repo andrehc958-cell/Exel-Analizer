@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
-import type { BillingDeps } from './billing'
-import { json } from './billing'
+import type { BillingDeps } from './billing.js'
+import { json } from './billing.js'
 
 /**
  * Lee la configuración desde variables de entorno del hosting. Las claves de Stripe
