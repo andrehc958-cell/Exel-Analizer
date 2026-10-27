@@ -97,6 +97,11 @@ export function ResultView({ engine, summary, version, onBack, onDownload, downl
         <DataTable engine={engine} which={view} version={version} onError={onError} />
       </div>
 
+      <p className="disclaimer">
+        Revisa el resultado antes de usarlo y conserva tu archivo original. Las correcciones automáticas pueden cometer
+        errores; consulta los <a href="#/terminos">Términos y condiciones</a>.
+      </p>
+
       <div className="action-bar">
         <button className="ghost" onClick={onBack}>
           ← Ajustar correcciones
