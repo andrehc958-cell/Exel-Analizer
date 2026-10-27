@@ -2,14 +2,11 @@ import Papa from 'papaparse'
 import type { Workbook, Worksheet } from 'exceljs'
 import type { AuditEntry, Cell, Limits, SheetInfo, Table } from './types'
 import { EngineError, STATUS_LABELS } from './types'
+import { DEFAULT_LIMITS } from './limits'
+
+export { DEFAULT_LIMITS }
 import { cellToString, formatDate, isCanonicalNumber, isEmpty } from './values'
 
-export const DEFAULT_LIMITS: Limits = {
-  maxBytes: 50 * 1024 * 1024,
-  maxRows: 500_000,
-  maxColumns: 500,
-  maxCells: 10_000_000,
-}
 
 export type FileKind = 'csv' | 'xlsx'
 

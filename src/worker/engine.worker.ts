@@ -15,7 +15,7 @@ scope.onmessage = async (event: MessageEvent<Request>) => {
     const transfer: Transferable[] = []
     switch (method) {
       case 'open':
-        value = await session.open(new Uint8Array(args.buffer), args.name)
+        value = await session.open(new Uint8Array(args.buffer), args.name, args.limits)
         break
       case 'selectSheet':
         value = session.selectSheet(args.sheet, args.hasHeader)
