@@ -26,6 +26,10 @@ export function Privacy() {
           tarjeta los recaba y procesa directamente Stripe; el Responsable nunca recibe el número completo de tu tarjeta.
         </li>
         <li>
+          <strong>Datos de contacto</strong> (sólo si nos escribes por Servicio al cliente o el Buzón de sugerencias):
+          nombre, correo electrónico y el contenido de tu mensaje. En el buzón de sugerencias son opcionales.
+        </li>
+        <li>
           <strong>Datos técnicos</strong>: dirección IP, tipo de navegador, fecha y hora de las solicitudes a nuestros
           servidores, que el proveedor de hospedaje registra por seguridad.
         </li>
@@ -42,6 +46,7 @@ export function Privacy() {
         <li>Gestionar tu suscripción, cobros, renovaciones, cancelaciones y comprobantes fiscales.</li>
         <li>Verificar tu plan y habilitar las funciones contratadas.</li>
         <li>Atender solicitudes de soporte, aclaraciones y ejercicio de derechos.</li>
+        <li>Analizar las sugerencias recibidas para mejorar el Servicio.</li>
         <li>Mantener la seguridad del Servicio y prevenir fraudes.</li>
         <li>Cumplir obligaciones legales, fiscales y requerimientos de autoridades.</li>
       </ul>
@@ -57,6 +62,10 @@ export function Privacy() {
         <li>
           <strong>El proveedor de hospedaje</strong> del sitio y de las funciones de pago, como encargado del tratamiento.
         </li>
+        <li>
+          <strong>El proveedor de correo electrónico</strong> que entrega los mensajes de los formularios, como encargado
+          del tratamiento.
+        </li>
         <li>Autoridades competentes, cuando lo exija la ley o un mandato judicial.</li>
       </ul>
       <p>
@@ -66,6 +75,7 @@ export function Privacy() {
 
       <h2>5. Conservación</h2>
       <p>
+        Conservamos los mensajes de soporte y sugerencias el tiempo necesario para atenderlos y darles seguimiento.
         Conservamos los datos de suscripción mientras esté vigente y, después, durante los plazos que exijan las
         disposiciones fiscales y legales aplicables. Al concluir, se eliminan o bloquean.
       </p>

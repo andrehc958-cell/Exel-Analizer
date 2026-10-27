@@ -117,6 +117,16 @@ Mientras `VITE_BILLING_ENABLED` no sea `true`, la aplicación funciona sin lími
 Limitación conocida: como no hay cuentas, la licencia vive en el navegador donde se pagó. Para usarla
 en otro equipo hará falta inicio de sesión (MVP 2 del plan).
 
+## Servicio al cliente y buzón de sugerencias
+
+- `#/soporte`: preguntas frecuentes y formulario de contacto (tema, nombre, correo, mensaje y aceptación del aviso de privacidad).
+- `#/sugerencias`: buzón donde el nombre y el correo son opcionales, para permitir sugerencias anónimas.
+
+Los dos formularios envían a `POST /api/contact`, que valida los datos, descarta bots con un campo
+trampa y manda el mensaje por correo con [Resend](https://resend.com) a `CONTACT_TO`, con
+`reply_to` igual al correo del usuario para responderle directamente. Si `RESEND_API_KEY` no está
+configurada, el formulario ofrece escribir a `VITE_LEGAL_EMAIL`.
+
 ## Aviso de privacidad y Términos
 
 `#/privacidad` y `#/terminos` contienen un aviso de privacidad integral (LFPDPPP) y términos con
