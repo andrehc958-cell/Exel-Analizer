@@ -1,5 +1,5 @@
 import type Stripe from 'stripe'
-import { LICENSE_TTL_SECONDS, signLicense, verifyLicense } from './license'
+import { LICENSE_TTL_SECONDS, signLicense, verifyLicense } from './license.js'
 
 export interface BillingEnv {
   appUrl: string
