@@ -112,6 +112,11 @@ CSP que impide que la página envíe datos a otros dominios).
 4. En el hosting define las variables de `.env.example`: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO`,
    `STRIPE_WEBHOOK_SECRET`, `LICENSE_SECRET`, `APP_URL` y `VITE_BILLING_ENABLED=true`.
 
+En Vercel basta con menos: la integración de Stripe crea la clave con prefijo (`ALGO_STRIPE_SECRET_KEY`) y se
+usa tal cual; `APP_URL` toma el dominio de producción del proyecto, y si falta `LICENSE_SECRET` se deriva uno
+de la clave de Stripe (al rotar esa clave los clientes tendrán que restaurar su licencia). Lo mínimo es
+`STRIPE_PRICE_PRO` y `VITE_BILLING_ENABLED=true`.
+
 Mientras `VITE_BILLING_ENABLED` no sea `true`, la aplicación funciona sin límites de plan y sin pagos.
 **Las claves de Stripe nunca deben subirse al repositorio.**
 
