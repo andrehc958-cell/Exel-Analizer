@@ -1,0 +1,12 @@
+# Configuración para Render (Blueprint). Las claves se agregan en el panel de Render, nunca aquí.
+services:
+  - type: web
+    name: dataclean
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build && npm run build:server
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"

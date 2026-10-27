@@ -83,6 +83,18 @@ procesamiento en servidor (lotes, API), el mismo motor puede correr en Node.
 - Las fechas ambiguas y las conversiones de tipo nunca se aplican sin una decisión explícita.
 - Los valores que no se pueden convertir se dejan intactos y se reportan.
 
+## Publicar
+
+- **Vercel**: importa el repositorio; usa `vercel.json` y las funciones de `api/` directamente.
+- **Render** (o cualquier hosting con Node): crea un *Web Service* con
+  - Build Command: `npm ci && npm run build && npm run build:server`
+  - Start Command: `npm start`
+
+  `server/http.ts` sirve `dist/`, ejecuta las funciones de `api/` y aplica las mismas cabeceras y
+  reescrituras de `vercel.json`. `render.yaml` permite crearlo como Blueprint.
+
+Las variables de entorno son las mismas en ambos casos (ver `.env.example`).
+
 ## Pagos con Stripe
 
 Planes: **Gratis** (archivos de hasta 5 MB y 20 000 filas) y **Pro** (suscripción mensual, hasta 50 MB y 500 000 filas).

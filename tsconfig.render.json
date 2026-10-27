@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.server.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "build-server",
+    "tsBuildInfoFile": null
+  },
+  "include": ["api", "server"],
+  "exclude": ["server/__tests__"]
+}
