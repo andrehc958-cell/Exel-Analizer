@@ -3,7 +3,8 @@ import { LICENSE_TTL_SECONDS, signLicense, verifyLicense } from './license.js'
 
 export interface BillingEnv {
   appUrl: string
-  pricePro: string
+  /** Precio recurrente mensual. Sin él se cobra DEFAULT_PRO_PRICE, definido aquí. */
+  pricePro?: string
   /** Precio recurrente anual (opcional). */
   priceProAnnual?: string
   /** Precio de pago único del pase de 24 horas (opcional). */
@@ -25,6 +26,14 @@ export const PASS_SECONDS = 24 * 60 * 60
 
 /** Marca en los metadatos de Checkout: sólo estas sesiones de pago único activan un pase (no las donaciones). */
 const PASS_METADATA = { product: 'pass' }
+
+/** Precio mensual por defecto ($199 MXN), coincide con la etiqueta por defecto de la página de precios. */
+export const DEFAULT_PRO_PRICE: Stripe.Checkout.SessionCreateParams.LineItem.PriceData = {
+  currency: 'mxn',
+  unit_amount: 19900,
+  recurring: { interval: 'month' },
+  product_data: { name: 'DataClean Pro' },
+}
 
 export type CheckoutProduct = 'monthly' | 'annual' | 'pass'
 
@@ -54,12 +63,17 @@ export async function createCheckout({ stripe, env }: BillingDeps, request: Requ
       metadata: { ...PASS_METADATA, ...acceptedAt },
     })
   } else if (product === 'monthly' || product === 'annual') {
-    const price = product === 'annual' ? env.priceProAnnual : env.pricePro
-    if (!price) return json({ error: 'El plan anual no está disponible.' }, 400)
+    let item: Stripe.Checkout.SessionCreateParams.LineItem
+    if (product === 'annual') {
+      if (!env.priceProAnnual) return json({ error: 'El plan anual no está disponible.' }, 400)
+      item = { price: env.priceProAnnual, quantity: 1 }
+    } else {
+      item = env.pricePro ? { price: env.pricePro, quantity: 1 } : { price_data: DEFAULT_PRO_PRICE, quantity: 1 }
+    }
     session = await stripe.checkout.sessions.create({
       ...common,
       mode: 'subscription',
-      line_items: [{ price, quantity: 1 }],
+      line_items: [item],
       // Se registra la aceptación de los términos en los metadatos de la suscripción.
       subscription_data: { metadata: acceptedAt },
     })

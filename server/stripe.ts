@@ -11,12 +11,12 @@ export function billingDeps(env: NodeJS.ProcessEnv = process.env): BillingDeps |
   const secretKey = env.STRIPE_SECRET_KEY || prefixed(env, 'STRIPE_SECRET_KEY')
   const { STRIPE_PRICE_PRO, STRIPE_PRICE_PRO_ANNUAL, STRIPE_PRICE_PASS } = env
   const appUrl = env.APP_URL || (env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${env.VERCEL_PROJECT_PRODUCTION_URL}` : '')
-  if (!secretKey || !STRIPE_PRICE_PRO || !appUrl) return null
+  if (!secretKey || !appUrl) return null
   return {
     stripe: new Stripe(secretKey),
     env: {
       appUrl: appUrl.replace(/\/$/, ''),
-      pricePro: STRIPE_PRICE_PRO,
+      pricePro: STRIPE_PRICE_PRO || undefined,
       priceProAnnual: STRIPE_PRICE_PRO_ANNUAL || undefined,
       pricePass: STRIPE_PRICE_PASS || undefined,
       // Sin LICENSE_SECRET propio se deriva uno estable de la clave de Stripe (cambiarla invalida las licencias guardadas).
