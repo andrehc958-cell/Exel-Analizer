@@ -1,6 +1,6 @@
 import Stripe from 'stripe'
 import { describe, expect, it, vi } from 'vitest'
-import { createCheckout, createPortal, handleWebhook, issueLicense } from '../billing'
+import { DEFAULT_PRO_PRICE, createCheckout, createPortal, handleWebhook, issueLicense } from '../billing'
 import type { BillingDeps } from '../billing'
 import { signLicense, verifyLicense } from '../license'
 
@@ -78,6 +78,14 @@ describe('billing', () => {
     const sinExtras = { ...d, env: { ...env, priceProAnnual: undefined, pricePass: undefined } }
     expect((await createCheckout(sinExtras, post({ acceptedTerms: true, product: 'annual' }))).status).toBe(400)
     expect((await createCheckout(sinExtras, post({ acceptedTerms: true, product: 'pass' }))).status).toBe(400)
+  })
+
+  it('sin precio mensual configurado cobra el precio por defecto', async () => {
+    const d = { ...deps(), env: { ...env, pricePro: undefined } }
+    expect((await createCheckout(d, post({ acceptedTerms: true }))).status).toBe(200)
+    expect(d.stripe.checkout.sessions.create).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'subscription', line_items: [{ price_data: DEFAULT_PRO_PRICE, quantity: 1 }] }),
+    )
   })
 
   it('el pase dura 24 horas desde la compra, no se renueva y no abre el portal', async () => {
