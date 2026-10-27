@@ -1,4 +1,4 @@
-import { createPortal } from '../server/billing'
-import { withBilling } from '../server/stripe'
+import { createPortal } from '../server/billing.js'
+import { withBilling } from '../server/stripe.js'
 
 export const POST = withBilling(createPortal)

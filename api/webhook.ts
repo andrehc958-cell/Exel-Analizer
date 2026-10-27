@@ -1,4 +1,4 @@
-import { handleWebhook } from '../server/billing'
-import { withBilling } from '../server/stripe'
+import { handleWebhook } from '../server/billing.js'
+import { withBilling } from '../server/stripe.js'
 
 export const POST = withBilling(handleWebhook)

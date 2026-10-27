@@ -1,4 +1,4 @@
-import { sendContact } from '../server/contact'
+import { sendContact } from '../server/contact.js'
 
 export function POST(request: Request): Promise<Response> {
   return sendContact(
