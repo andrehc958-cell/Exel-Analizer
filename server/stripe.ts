@@ -7,13 +7,16 @@ import { json } from './billing.js'
  * nunca se guardan en el repositorio (ver .env.example).
  */
 export function billingDeps(): BillingDeps | null {
-  const { STRIPE_SECRET_KEY, STRIPE_PRICE_PRO, LICENSE_SECRET, APP_URL, STRIPE_WEBHOOK_SECRET } = process.env
+  const { STRIPE_SECRET_KEY, STRIPE_PRICE_PRO, STRIPE_PRICE_PRO_ANNUAL, STRIPE_PRICE_PASS, LICENSE_SECRET, APP_URL, STRIPE_WEBHOOK_SECRET } =
+    process.env
   if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_PRO || !LICENSE_SECRET || !APP_URL) return null
   return {
     stripe: new Stripe(STRIPE_SECRET_KEY),
     env: {
       appUrl: APP_URL.replace(/\/$/, ''),
       pricePro: STRIPE_PRICE_PRO,
+      priceProAnnual: STRIPE_PRICE_PRO_ANNUAL || undefined,
+      pricePass: STRIPE_PRICE_PASS || undefined,
       licenseSecret: LICENSE_SECRET,
       webhookSecret: STRIPE_WEBHOOK_SECRET,
     },

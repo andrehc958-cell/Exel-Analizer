@@ -6,7 +6,14 @@ import { signLicense, verifyLicense } from '../license'
 
 const SECRET = 'test-secret'
 const NOW = 1_800_000_000_000
-const env = { appUrl: 'https://dataclean.test', pricePro: 'price_123', licenseSecret: SECRET, webhookSecret: 'whsec_test' }
+const env = {
+  appUrl: 'https://dataclean.test',
+  pricePro: 'price_123',
+  priceProAnnual: 'price_year',
+  pricePass: 'price_pass',
+  licenseSecret: SECRET,
+  webhookSecret: 'whsec_test',
+}
 
 function deps(overrides: Record<string, unknown> = {}): BillingDeps {
   const stripe = {
@@ -50,6 +57,53 @@ describe('billing', () => {
     expect(d.stripe.checkout.sessions.create).toHaveBeenCalledWith(
       expect.objectContaining({ mode: 'subscription', line_items: [{ price: 'price_123', quantity: 1 }] }),
     )
+  })
+
+  it('checkout anual y pase de 24 horas', async () => {
+    const d = deps()
+    const create = d.stripe.checkout.sessions.create as unknown as ReturnType<typeof vi.fn>
+    await createCheckout(d, post({ acceptedTerms: true, product: 'annual' }))
+    expect(create).toHaveBeenLastCalledWith(
+      expect.objectContaining({ mode: 'subscription', line_items: [{ price: 'price_year', quantity: 1 }] }),
+    )
+    await createCheckout(d, post({ acceptedTerms: true, product: 'pass' }))
+    expect(create).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        mode: 'payment',
+        line_items: [{ price: 'price_pass', quantity: 1 }],
+        metadata: expect.objectContaining({ product: 'pass' }),
+      }),
+    )
+    expect((await createCheckout(d, post({ acceptedTerms: true, product: 'otro' }))).status).toBe(400)
+    const sinExtras = { ...d, env: { ...env, priceProAnnual: undefined, pricePass: undefined } }
+    expect((await createCheckout(sinExtras, post({ acceptedTerms: true, product: 'annual' }))).status).toBe(400)
+    expect((await createCheckout(sinExtras, post({ acceptedTerms: true, product: 'pass' }))).status).toBe(400)
+  })
+
+  it('el pase dura 24 horas desde la compra, no se renueva y no abre el portal', async () => {
+    const d = deps()
+    const retrieve = d.stripe.checkout.sessions.retrieve as unknown as ReturnType<typeof vi.fn>
+    const created = NOW / 1000 - 3600
+    retrieve.mockResolvedValue({ id: 'cs_pass', mode: 'payment', status: 'complete', payment_status: 'paid', created, metadata: { product: 'pass' } })
+    const res = await issueLicense(d, post({ sessionId: 'cs_pass' }))
+    expect(res.status).toBe(200)
+    const { token, expiresAt, kind } = (await res.json()) as { token: string; expiresAt: number; kind: string }
+    expect(kind).toBe('pass')
+    expect(expiresAt).toBe(created + 24 * 3600)
+    expect((await issueLicense(d, post({ token }))).status).toBe(402)
+    expect((await createPortal(d, post({ token }))).status).toBe(400)
+
+    retrieve.mockResolvedValue({ id: 'cs_old', mode: 'payment', status: 'complete', payment_status: 'paid', created: NOW / 1000 - 25 * 3600, metadata: { product: 'pass' } })
+    expect((await issueLicense(d, post({ sessionId: 'cs_old' }))).status).toBe(402)
+  })
+
+  it('un pago que no es pase (p. ej. una donación) no da acceso', async () => {
+    const d = deps()
+    const retrieve = d.stripe.checkout.sessions.retrieve as unknown as ReturnType<typeof vi.fn>
+    retrieve.mockResolvedValue({ id: 'cs_don', mode: 'payment', status: 'complete', payment_status: 'paid', created: NOW / 1000, metadata: {} })
+    expect((await issueLicense(d, post({ sessionId: 'cs_don' }))).status).toBe(402)
+    retrieve.mockResolvedValue({ id: 'cs_unpaid', mode: 'payment', status: 'complete', payment_status: 'unpaid', created: NOW / 1000, metadata: { product: 'pass' } })
+    expect((await issueLicense(d, post({ sessionId: 'cs_unpaid' }))).status).toBe(402)
   })
 
   it('emite licencia tras un pago completado y la renueva con el comprobante', async () => {

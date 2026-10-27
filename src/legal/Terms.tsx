@@ -58,16 +58,29 @@ export function Terms() {
 
       <h2>5. Planes, pagos y cancelación</h2>
       <ul>
-        <li>El plan gratuito tiene límites de tamaño y número de filas por archivo, que pueden cambiar.</li>
         <li>
-          El plan Pro es una suscripción mensual que se cobra por adelantado a través de Stripe y se renueva
-          automáticamente hasta que la canceles. El precio vigente se muestra antes de pagar e incluye los impuestos
+          El plan gratuito tiene límites de tamaño y número de filas por archivo, que pueden cambiar, y puede mostrar
+          publicidad de terceros conforme al <a href="#/privacidad">Aviso de privacidad</a>.
+        </li>
+        <li>
+          El plan Pro es una suscripción mensual o anual, según elijas, que se cobra por adelantado a través de Stripe y
+          se renueva automáticamente por el mismo periodo hasta que la canceles. El precio vigente se muestra antes de pagar e incluye los impuestos
           aplicables, salvo que se indique otra cosa.
         </li>
         <li>
           Puedes cancelar en cualquier momento desde «Administrar suscripción». La cancelación surte efecto al final del
           periodo ya pagado y no se generan cargos posteriores. Salvo que la ley disponga otra cosa, no se hacen
           reembolsos proporcionales por periodos parciales.
+        </li>
+        <li>
+          El pase de 24 horas es un pago único que habilita las funciones de Pro en el navegador donde se compra
+          durante 24 horas contadas desde el pago. No se renueva ni genera cargos posteriores. Como el acceso se entrega
+          de inmediato, salvo que la ley disponga otra cosa, no es reembolsable una vez activado.
+        </li>
+        <li>
+          Las donaciones son aportaciones voluntarias para apoyar el desarrollo del Servicio. No constituyen la compra
+          de un producto o servicio, no cambian tu plan ni dan derecho a funciones adicionales y no son deducibles de
+          impuestos. Si hiciste una donación por error, escríbenos dentro de los 30 días siguientes para devolverla.
         </li>
         <li>Los cambios de precio se avisarán con anticipación y aplicarán a partir del siguiente periodo de facturación.</li>
       </ul>

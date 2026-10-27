@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
+import { AdSlot } from './ads/AdSlot'
+import { ADS_ENABLED } from './ads/config'
+import { ConsentBanner } from './ads/ConsentBanner'
+import { useAdConsent } from './ads/consent'
 import { useLicense } from './billing/license'
-import { BILLING_ENABLED, limitsFor } from './billing/plan'
+import { BILLING_ENABLED, DONATION_URL, limitsFor } from './billing/plan'
 import { Pricing } from './billing/Pricing'
 import { Privacy } from './legal/Privacy'
 import { Terms } from './legal/Terms'
@@ -20,6 +24,9 @@ function readRoute(): Route {
 export default function App() {
   const [route, setRoute] = useState<Route>(readRoute)
   const license = useLicense()
+  const ads = useAdConsent()
+  // Pro (suscripción o pase) nunca ve anuncios ni el aviso de consentimiento.
+  const isFree = license.plan === 'free'
 
   useEffect(() => {
     const onHash = () => {
@@ -66,16 +73,30 @@ export default function App() {
         </main>
       )}
 
+      {isFree && <AdSlot consent={ads.consent} />}
+
       <footer className="footer">
         <span>© {new Date().getFullYear()} DataClean</span>
         <nav aria-label="Enlaces del sitio">
           <a href="#/soporte">Servicio al cliente</a>
           <a href="#/sugerencias">Buzón de sugerencias</a>
           {BILLING_ENABLED && <a href="#/precios">Planes</a>}
+          {DONATION_URL && (
+            <a href={DONATION_URL} target="_blank" rel="noopener noreferrer">
+              Apóyanos
+            </a>
+          )}
           <a href="#/terminos">Términos y condiciones</a>
           <a href="#/privacidad">Aviso de privacidad</a>
+          {ADS_ENABLED && isFree && ads.consent && (
+            <button className="link" onClick={() => ads.choose(null)}>
+              Preferencias de anuncios
+            </button>
+          )}
         </nav>
       </footer>
+
+      {ADS_ENABLED && isFree && !ads.consent && <ConsentBanner onChoose={ads.choose} />}
     </div>
   )
 }

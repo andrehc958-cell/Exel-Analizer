@@ -1,8 +1,9 @@
+import { ADS_ENABLED } from '../ads/config'
 import { BILLING_ENABLED } from '../billing/plan'
 import { LEGAL } from '../legal/config'
 import { ContactForm } from './ContactForm'
 
-const FAQ: { q: string; a: string; billing?: boolean }[] = [
+const FAQ: { q: string; a: string; billing?: boolean; ads?: boolean }[] = [
   {
     q: '¿Mis archivos se suben a algún servidor?',
     a: 'No. Todo el análisis y la limpieza ocurren en tu navegador. Ni nosotros ni nadie más puede ver el contenido de tus archivos.',
@@ -23,6 +24,16 @@ const FAQ: { q: string; a: string; billing?: boolean }[] = [
     q: 'Pagué el plan Pro pero sigo en el plan gratuito',
     a: 'La suscripción se activa en el navegador donde pagaste. Si cambiaste de navegador o borraste los datos del sitio, escríbenos con el correo que usaste en Stripe y te ayudamos.',
     billing: true,
+  },
+  {
+    q: '¿Qué es el pase de 24 horas?',
+    a: 'Un pago único que activa las funciones de Pro en este navegador durante 24 horas. No es una suscripción: no se renueva ni se vuelve a cobrar.',
+    billing: true,
+  },
+  {
+    q: '¿Por qué veo anuncios? ¿Pueden ver mis archivos?',
+    a: 'Los anuncios mantienen gratis el plan básico. Se muestran en un recuadro aislado que no puede leer tus archivos ni la página. Puedes cambiar tu preferencia en «Preferencias de anuncios», al pie de la página, o quitarlos con Pro.',
+    ads: true,
   },
   {
     q: '¿Cómo cancelo mi suscripción?',
@@ -52,7 +63,7 @@ export function Support() {
 
       <div className="card">
         <h2>Preguntas frecuentes</h2>
-        {FAQ.filter((f) => !f.billing || BILLING_ENABLED).map((f) => (
+        {FAQ.filter((f) => (!f.billing || BILLING_ENABLED) && (!f.ads || ADS_ENABLED)).map((f) => (
           <details key={f.q} className="faq">
             <summary>{f.q}</summary>
             <p>{f.a}</p>
