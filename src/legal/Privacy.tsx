@@ -21,7 +21,8 @@ export function Privacy() {
       <h2>2. Datos personales que sí tratamos</h2>
       <ul>
         <li>
-          <strong>Datos de suscripción y facturación</strong> (sólo si contratas el plan Pro): nombre, correo electrónico,
+          <strong>Datos de pago y facturación</strong> (sólo si contratas el plan Pro, compras un pase o haces una
+          donación): nombre, correo electrónico,
           país y, en su caso, datos fiscales; identificador de cliente y estado de la suscripción. Los datos de tu
           tarjeta los recaba y procesa directamente Stripe; el Responsable nunca recibe el número completo de tu tarjeta.
         </li>
@@ -35,22 +36,40 @@ export function Privacy() {
         </li>
         <li>
           <strong>Almacenamiento local</strong>: guardamos en tu navegador un comprobante de licencia para recordar tu
-          plan. No usamos cookies publicitarias ni herramientas de rastreo de terceros.
+          plan y tu preferencia sobre anuncios. No usamos herramientas de analítica ni de rastreo propias.
+        </li>
+        <li>
+          <strong>Datos de publicidad</strong> (sólo en el plan gratuito y sólo si aceptas ver anuncios): Google
+          AdSense puede recabar tu dirección IP, datos del navegador y del dispositivo, y usar cookies o
+          identificadores similares para mostrar, medir y limitar la frecuencia de los anuncios. Si eliges anuncios
+          personalizados, Google también puede usarlos para seleccionar anuncios según tus intereses. Estos datos los
+          recaba Google directamente, conforme a su propia política de privacidad; el Responsable no los recibe.
         </li>
       </ul>
+      <p>
+        Los anuncios se muestran dentro de un recuadro aislado del resto de la página. El código publicitario{' '}
+        <strong>no puede leer tus archivos</strong> ni lo que haces en el limpiador. Los usuarios del plan Pro y del
+        pase de 24 horas no ven anuncios.
+      </p>
       <p>No solicitamos datos personales sensibles.</p>
 
       <h2>3. Finalidades</h2>
       <p>Tus datos se utilizan para las siguientes finalidades necesarias para prestar el Servicio:</p>
       <ul>
-        <li>Gestionar tu suscripción, cobros, renovaciones, cancelaciones y comprobantes fiscales.</li>
+        <li>Gestionar tu suscripción o pase, cobros, renovaciones, cancelaciones, donaciones y comprobantes fiscales.</li>
         <li>Verificar tu plan y habilitar las funciones contratadas.</li>
         <li>Atender solicitudes de soporte, aclaraciones y ejercicio de derechos.</li>
         <li>Analizar las sugerencias recibidas para mejorar el Servicio.</li>
         <li>Mantener la seguridad del Servicio y prevenir fraudes.</li>
         <li>Cumplir obligaciones legales, fiscales y requerimientos de autoridades.</li>
       </ul>
-      <p>No utilizamos tus datos para finalidades secundarias como publicidad o elaboración de perfiles.</p>
+      <p>
+        <strong>Finalidad secundaria:</strong> mostrar publicidad de terceros en el plan gratuito y, sólo si lo aceptas,
+        publicidad personalizada según tus intereses. Esta finalidad no es necesaria para prestar el Servicio: puedes
+        negarte desde el aviso que aparece en tu primera visita o en cualquier momento desde «Preferencias de anuncios»
+        al pie de la página, sin que eso afecte tu uso del Servicio. También puedes desactivar la publicidad
+        personalizada de Google en <strong>adssettings.google.com</strong>.
+      </p>
 
       <h2>4. Transferencias y encargados</h2>
       <p>Para prestar el Servicio compartimos datos con:</p>
@@ -58,6 +77,10 @@ export function Privacy() {
         <li>
           <strong>Stripe</strong>, procesador de pagos, que puede tratar los datos fuera de México conforme a su propio
           aviso de privacidad.
+        </li>
+        <li>
+          <strong>Google (AdSense)</strong>, sólo si aceptas ver anuncios, que recaba los datos de publicidad descritos
+          arriba como tercero responsable de su propio tratamiento y puede tratarlos fuera de México.
         </li>
         <li>
           <strong>El proveedor de hospedaje</strong> del sitio y de las funciones de pago, como encargado del tratamiento.
@@ -69,8 +92,9 @@ export function Privacy() {
         <li>Autoridades competentes, cuando lo exija la ley o un mandato judicial.</li>
       </ul>
       <p>
-        Estas comunicaciones son necesarias para cumplir la relación contractual contigo o una obligación legal, por lo
-        que no requieren tu consentimiento conforme a la ley. No vendemos tus datos personales.
+        Salvo la de Google, estas comunicaciones son necesarias para cumplir la relación contractual contigo o una
+        obligación legal, por lo que no requieren tu consentimiento conforme a la ley. La publicidad de Google sólo se
+        carga con tu consentimiento. No vendemos tus datos personales.
       </p>
 
       <h2>5. Conservación</h2>

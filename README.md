@@ -95,10 +95,11 @@ ya no se renueva y el navegador vuelve al plan gratuito.
 
 | Función (`api/`) | Qué hace |
 | --- | --- |
-| `POST /api/checkout` | Crea la sesión de Stripe Checkout (exige aceptar Términos y Aviso de privacidad) |
-| `POST /api/license` | Emite o renueva el comprobante tras verificar la suscripción en Stripe |
+| `POST /api/checkout` | Crea la sesión de Stripe Checkout: Pro mensual, Pro anual o pase de 24 h (exige aceptar Términos y Aviso de privacidad) |
+| `POST /api/license` | Emite o renueva el comprobante tras verificar la suscripción o el pago del pase en Stripe |
 | `POST /api/portal` | Abre el portal de cliente de Stripe (tarjeta, facturas, cancelación) |
 | `POST /api/webhook` | Recibe eventos de Stripe y verifica su firma |
+| `GET /ads.txt` | Declara la cuenta de AdSense (`api/ads-txt.ts`) |
 
 Las funciones usan el formato de Vercel (`vercel.json` incluye también cabeceras de seguridad y una
 CSP que impide que la página envíe datos a otros dominios).
@@ -116,6 +117,50 @@ Mientras `VITE_BILLING_ENABLED` no sea `true`, la aplicación funciona sin lími
 
 Limitación conocida: como no hay cuentas, la licencia vive en el navegador donde se pagó. Para usarla
 en otro equipo hará falta inicio de sesión (MVP 2 del plan).
+
+## Otras fuentes de ingreso
+
+Todas son opcionales y se activan con variables de entorno (ver `.env.example`).
+
+| Fuente | Cómo funciona | Variables |
+| --- | --- | --- |
+| **Plan Pro anual** | Suscripción anual con descuento (sugerido: $1,990 MXN, 2 meses gratis). Mismo flujo y portal que el mensual. | `STRIPE_PRICE_PRO_ANNUAL`, `VITE_PRO_ANNUAL_PRICE_LABEL`, `VITE_PRO_ANNUAL_NOTE` |
+| **Pase de 24 horas** | Pago único (sugerido: $49 MXN) para quien sólo necesita limpiar un archivo grande. Da Pro durante 24 h desde la compra y no se renueva. | `STRIPE_PRICE_PASS`, `VITE_PASS_PRICE_LABEL` |
+| **Donaciones** | Botón «Invítanos un café» en Planes, en el pie y en el aviso del plan gratuito. Usa un [Payment Link](https://dashboard.stripe.com/payment-links) de Stripe con «el cliente elige el monto»; no necesita código de servidor. | `VITE_DONATION_URL` |
+| **Anuncios** | Google AdSense, sólo para el plan gratuito y sólo tras aceptar en el aviso de consentimiento. Pro y pase no ven anuncios. | `VITE_ADSENSE_CLIENT`, `VITE_ADSENSE_SLOT` |
+
+### Configurar el plan anual y el pase
+
+1. En el producto «DataClean Pro» de Stripe agrega un precio recurrente **anual** en MXN y copia su `price_…`.
+2. Crea un producto «Pase DataClean 24 horas» con un precio **único** y copia su `price_…`.
+3. Define `STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_PASS` y las etiquetas `VITE_…` en el hosting.
+
+El pase sólo se activa con sesiones de Checkout creadas por `/api/checkout` (llevan `metadata.product = pass`),
+así que una donación u otro cobro de la misma cuenta nunca da acceso Pro.
+
+### Anuncios sin comprometer la privacidad
+
+La promesa de DataClean es que los archivos no salen del navegador, así que el código de AdSense **nunca se
+carga en la página del limpiador**:
+
+- El anuncio vive en `public/anuncio.html`, dentro de un iframe con `sandbox` **sin** `allow-same-origin`. El
+  navegador le asigna un origen opaco: no puede leer la página, los datos del archivo ni el almacenamiento local.
+- La página principal conserva su CSP estricta (`script-src 'self'`, `connect-src 'self'`); sólo `anuncio.html`
+  tiene una CSP que permite los dominios de Google.
+- No se carga ningún anuncio hasta que el visitante elige en el aviso: «Aceptar» (personalizados), «Sólo no
+  personalizados» (`requestNonPersonalizedAds`) o «Rechazar» (se muestra un aviso propio para apoyar con Pro o
+  una donación). La elección se puede cambiar en «Preferencias de anuncios», al pie de la página.
+- `/ads.txt` se genera a partir de `VITE_ADSENSE_CLIENT` (`api/ads-txt.ts`) y el build agrega la etiqueta
+  `google-adsense-account` para que Google verifique el sitio.
+
+Pasos: crea la cuenta en [AdSense](https://adsense.google.com), agrega el dominio, crea un bloque de anuncios
+de display y copia `ca-pub-…` y el id del bloque en `VITE_ADSENSE_CLIENT` y `VITE_ADSENSE_SLOT`.
+
+Compromiso conocido: con origen opaco el anuncio no tiene cookies, por lo que AdSense puede servir menos anuncios
+o pagar menos por ellos. Si se quiere mejorar, aloja `anuncio.html` y `anuncio.js` en **otro dominio** (por ejemplo
+`anuncios-dataclean.com`), define `VITE_AD_FRAME_URL` con esa dirección y agrega ese origen a `frame-src` en
+`vercel.json`: al ser otro origen el navegador sigue impidiendo que lea la página, y el iframe puede conservar
+sus cookies.
 
 ## Servicio al cliente y buzón de sugerencias
 

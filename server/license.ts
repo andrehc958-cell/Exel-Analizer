@@ -9,9 +9,13 @@ export interface LicensePayload {
   /** Id de cliente de Stripe. */
   customer: string
   plan: 'pro'
+  /** Origen del acceso: suscripción (se renueva) o pase de pago único (no se renueva). Sin valor = suscripción. */
+  kind?: LicenseKind
   /** Caducidad en segundos Unix. */
   exp: number
 }
+
+export type LicenseKind = 'sub' | 'pass'
 
 export const LICENSE_TTL_SECONDS = 7 * 24 * 60 * 60
 
@@ -29,6 +33,7 @@ export function verifyLicense(token: string, secret: string, now = Date.now() / 
   try {
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString()) as LicensePayload
     if (typeof payload.customer !== 'string' || payload.plan !== 'pro' || typeof payload.exp !== 'number') return null
+    if (payload.kind !== undefined && payload.kind !== 'sub' && payload.kind !== 'pass') return null
     return payload.exp > now ? payload : null
   } catch {
     return null

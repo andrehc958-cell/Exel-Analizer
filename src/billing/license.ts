@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { BILLING_ENABLED } from './plan'
-import type { PlanId } from './plan'
+import type { CheckoutProduct, PlanId } from './plan'
 
 const STORAGE_KEY = 'dataclean.license'
 const REFRESH_BEFORE_SECONDS = 2 * 24 * 60 * 60
@@ -8,6 +8,8 @@ const REFRESH_BEFORE_SECONDS = 2 * 24 * 60 * 60
 export interface StoredLicense {
   token: string
   expiresAt: number
+  /** 'pass' = pase de 24 horas (no se renueva). Sin valor = suscripción. */
+  kind?: 'sub' | 'pass'
   cancelAtPeriodEnd?: boolean
 }
 
@@ -45,6 +47,9 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 
 const now = () => Date.now() / 1000
 
+export const until = (seconds: number) =>
+  new Date(seconds * 1000).toLocaleString('es-MX', { dateStyle: 'medium', timeStyle: 'short' })
+
 /**
  * Estado de la suscripción en este navegador. El comprobante lo firma el servidor tras
  * consultar Stripe y se renueva solo antes de caducar.
@@ -75,13 +80,18 @@ export function useLicense() {
       post<StoredLicense>('/api/license', { sessionId })
         .then((l) => {
           save(l)
-          setMessage('¡Listo! Tu plan Pro está activo en este navegador.')
+          setMessage(
+            l.kind === 'pass'
+              ? `¡Listo! Tu pase Pro está activo en este navegador hasta el ${until(l.expiresAt)}.`
+              : '¡Listo! Tu plan Pro está activo en este navegador.',
+          )
         })
         .catch((e: Error) => setMessage(e.message))
       return
     }
     const current = load()
-    if (current && current.expiresAt - now() < REFRESH_BEFORE_SECONDS) {
+    // El pase no se renueva: al caducar se vuelve solo al plan gratuito.
+    if (current && current.kind !== 'pass' && current.expiresAt - now() < REFRESH_BEFORE_SECONDS) {
       post<StoredLicense>('/api/license', { token: current.token })
         .then(save)
         .catch((e) => {
@@ -93,8 +103,18 @@ export function useLicense() {
 
   const plan: PlanId = license && license.expiresAt > now() ? 'pro' : 'free'
 
-  const checkout = useCallback(async () => {
-    const { url } = await post<{ url: string }>('/api/checkout', { acceptedTerms: true })
+  // Vuelve al plan gratuito en cuanto caduque el comprobante (sobre todo el pase de 24 horas).
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    if (plan !== 'pro' || !license) return
+    const ms = (license.expiresAt - now()) * 1000
+    if (ms > 2 ** 31 - 1) return
+    const id = window.setTimeout(() => setTick((t) => t + 1), ms + 1000)
+    return () => window.clearTimeout(id)
+  }, [plan, license])
+
+  const checkout = useCallback(async (product: CheckoutProduct = 'monthly') => {
+    const { url } = await post<{ url: string }>('/api/checkout', { acceptedTerms: true, product })
     window.location.assign(url)
   }, [])
 
