@@ -1,8 +1,8 @@
 import type { CleanSummary, OpenResult, Page } from '../engine/session'
-import type { CleanOptions, QualityReport } from '../engine/types'
+import type { CleanOptions, Limits, QualityReport } from '../engine/types'
 
 export interface Methods {
-  open: { args: { buffer: ArrayBuffer; name: string }; result: OpenResult }
+  open: { args: { buffer: ArrayBuffer; name: string; limits: Limits }; result: OpenResult }
   selectSheet: { args: { sheet: number; hasHeader: boolean }; result: QualityReport }
   duplicates: { args: { key: number[] }; result: number }
   clean: { args: { options: CleanOptions }; result: CleanSummary }

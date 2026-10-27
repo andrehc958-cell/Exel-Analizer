@@ -11,7 +11,7 @@ el resultado junto con un registro de los cambios.
 ```bash
 npm install
 npm run dev       # servidor de desarrollo en http://localhost:5173
-npm test          # pruebas del motor de limpieza (Vitest)
+npm test          # pruebas del motor y de los pagos (Vitest)
 npm run build     # build de producción en dist/ (sitio estático)
 ```
 
@@ -82,6 +82,49 @@ procesamiento en servidor (lotes, API), el mismo motor puede correr en Node.
 - Los ceros a la izquierda (códigos postales, claves) se conservan como texto.
 - Las fechas ambiguas y las conversiones de tipo nunca se aplican sin una decisión explícita.
 - Los valores que no se pueden convertir se dejan intactos y se reportan.
+
+## Pagos con Stripe
+
+Planes: **Gratis** (archivos de hasta 5 MB y 20 000 filas) y **Pro** (suscripción mensual, hasta 50 MB y 500 000 filas).
+Los límites están en `src/billing/plan.ts`; el precio se define en Stripe.
+
+No hay base de datos ni cuentas: Stripe es la fuente de verdad. Tras pagar, el servidor consulta
+la suscripción en Stripe y entrega un comprobante de licencia firmado (HMAC) que el navegador
+guarda y renueva cada pocos días. Si la suscripción se cancela o deja de pagarse, el comprobante
+ya no se renueva y el navegador vuelve al plan gratuito.
+
+| Función (`api/`) | Qué hace |
+| --- | --- |
+| `POST /api/checkout` | Crea la sesión de Stripe Checkout (exige aceptar Términos y Aviso de privacidad) |
+| `POST /api/license` | Emite o renueva el comprobante tras verificar la suscripción en Stripe |
+| `POST /api/portal` | Abre el portal de cliente de Stripe (tarjeta, facturas, cancelación) |
+| `POST /api/webhook` | Recibe eventos de Stripe y verifica su firma |
+
+Las funciones usan el formato de Vercel (`vercel.json` incluye también cabeceras de seguridad y una
+CSP que impide que la página envíe datos a otros dominios).
+
+### Configuración
+
+1. En Stripe crea un producto «DataClean Pro» con un precio recurrente mensual en MXN y copia su `price_…`.
+2. Activa el portal de cliente en Stripe (Configuración → Facturación → Portal de clientes) con la opción de cancelar.
+3. Crea un webhook hacia `https://tu-dominio.com/api/webhook` y copia su `whsec_…`.
+4. En el hosting define las variables de `.env.example`: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_PRO`,
+   `STRIPE_WEBHOOK_SECRET`, `LICENSE_SECRET`, `APP_URL` y `VITE_BILLING_ENABLED=true`.
+
+Mientras `VITE_BILLING_ENABLED` no sea `true`, la aplicación funciona sin límites de plan y sin pagos.
+**Las claves de Stripe nunca deben subirse al repositorio.**
+
+Limitación conocida: como no hay cuentas, la licencia vive en el navegador donde se pagó. Para usarla
+en otro equipo hará falta inicio de sesión (MVP 2 del plan).
+
+## Aviso de privacidad y Términos
+
+`#/privacidad` y `#/terminos` contienen un aviso de privacidad integral (LFPDPPP) y términos con
+servicio «tal cual» y limitación de responsabilidad. Los datos del responsable se completan con las
+variables `VITE_LEGAL_*`; mientras falten, las páginas muestran un aviso de plantilla.
+**Son una plantilla y deben revisarse con un abogado antes de publicar.** Ningún texto legal elimina
+toda responsabilidad: por ejemplo, la ley no permite limitar la responsabilidad por dolo ni renunciar
+a los derechos del consumidor.
 
 ## Próximos pasos sugeridos
 

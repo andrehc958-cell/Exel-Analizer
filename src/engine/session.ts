@@ -1,7 +1,8 @@
 import type { Workbook } from 'exceljs'
 import { cleanTable } from './clean'
-import { DEFAULT_LIMITS, listSheets, matrixToTable, readCsv, readWorkbook, sheetMatrix, sniffFile, writeCsv, writeXlsx } from './io'
+import { listSheets, matrixToTable, readCsv, readWorkbook, sheetMatrix, sniffFile, writeCsv, writeXlsx } from './io'
 import type { FileKind } from './io'
+import { DEFAULT_LIMITS } from './limits'
 import { countDuplicates, profileTable } from './profile'
 import type { Cell, CleanOptions, CleanResult, Limits, QualityReport, SheetInfo, Table } from './types'
 import { EngineError } from './types'
@@ -46,14 +47,16 @@ export class CleaningSession {
   private csvMatrix: Cell[][] | null = null
   private original: Table | null = null
   private result: CleanResult | null = null
-  private readonly limits: Limits
+  private limits: Limits
 
   constructor(limits: Limits = DEFAULT_LIMITS) {
     this.limits = limits
   }
 
-  async open(bytes: Uint8Array, name: string): Promise<OpenResult> {
+  /** Los límites dependen del plan del usuario y se fijan al abrir cada archivo. */
+  async open(bytes: Uint8Array, name: string, limits: Limits = this.limits): Promise<OpenResult> {
     this.reset()
+    this.limits = limits
     const kind = sniffFile(bytes, name, this.limits)
     this.kind = kind
     this.name = name
