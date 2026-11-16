@@ -3,7 +3,7 @@ import type { Limits } from '../engine/types'
 
 /** Los pagos se activan al configurar Stripe en el hosting (ver README). */
 export const BILLING_ENABLED = import.meta.env.VITE_BILLING_ENABLED === 'true'
-export const PRO_PRICE_LABEL = import.meta.env.VITE_PRO_PRICE_LABEL || '$199 MXN al mes'
+export const PRO_PRICE_LABEL = import.meta.env.VITE_PRO_PRICE_LABEL || '$99 MXN al mes'
 /** El plan anual y el pase se muestran sólo si tienen precio configurado (y su price_… en el servidor). */
 export const PRO_ANNUAL_PRICE_LABEL = import.meta.env.VITE_PRO_ANNUAL_PRICE_LABEL || ''
 export const PRO_ANNUAL_NOTE = import.meta.env.VITE_PRO_ANNUAL_NOTE || ''
@@ -24,7 +24,7 @@ function safeUrl(value: string | undefined): string {
 export type PlanId = 'free' | 'pro'
 
 export const PLAN_LIMITS: Record<PlanId, Limits> = {
-  free: { maxBytes: 5 * 1024 * 1024, maxRows: 20_000, maxColumns: 100, maxCells: 1_000_000 },
+  free: { maxBytes: 5 * 1024 * 1024, maxRows: 10_000, maxColumns: 100, maxCells: 1_000_000 },
   pro: DEFAULT_LIMITS,
 }
 
