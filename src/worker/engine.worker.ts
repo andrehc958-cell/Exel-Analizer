@@ -8,7 +8,14 @@ import type { Request, Response } from './protocol'
 const session = new CleaningSession()
 const scope = self as unknown as DedicatedWorkerGlobalScope
 
-scope.onmessage = async (event: MessageEvent<Request>) => {
+// Las peticiones se atienden de una en una y en orden. Sin esta cola, dos clics rápidos (p. ej. abrir
+// otro archivo mientras se exporta) podrían intercalarse en los `await` y mezclar el estado de la sesión.
+let queue: Promise<void> = Promise.resolve()
+scope.onmessage = (event: MessageEvent<Request>) => {
+  queue = queue.then(() => handle(event))
+}
+
+async function handle(event: MessageEvent<Request>): Promise<void> {
   const { id, method, args } = event.data
   try {
     let value: unknown
