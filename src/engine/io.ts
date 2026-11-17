@@ -6,6 +6,7 @@ import { DEFAULT_LIMITS } from './limits'
 
 export { DEFAULT_LIMITS }
 import { cellToString, formatDate, isCanonicalNumber, isEmpty } from './values'
+import { inspectZip } from './zipguard'
 
 
 export type FileKind = 'csv' | 'xlsx'
@@ -30,6 +31,7 @@ export function sniffFile(bytes: Uint8Array, name: string, limits: Limits = DEFA
   }
   if (isZip) {
     if (ext !== 'xlsx') throw new EngineError('type', 'El archivo es un ZIP pero no tiene extensión .xlsx.')
+    inspectZip(bytes)
     return 'xlsx'
   }
   if (ext === 'xlsx') throw new EngineError('corrupt', 'El archivo dice ser .xlsx pero su contenido no es un libro de Excel válido.')

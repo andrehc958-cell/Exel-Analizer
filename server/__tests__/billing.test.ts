@@ -20,7 +20,7 @@ function deps(overrides: Record<string, unknown> = {}): BillingDeps {
     checkout: {
       sessions: {
         create: vi.fn(async () => ({ url: 'https://checkout.stripe.test/s' })),
-        retrieve: vi.fn(async () => ({ status: 'complete', customer: 'cus_1' })),
+        retrieve: vi.fn(async () => ({ status: 'complete', customer: 'cus_1', created: NOW / 1000 - 3600 })),
       },
     },
     subscriptions: {
@@ -132,6 +132,21 @@ describe('billing', () => {
     ;(unpaid.stripe.checkout.sessions.retrieve as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ status: 'open', customer: null })
     expect((await issueLicense(unpaid, post({ sessionId: 'cs_1' }))).status).toBe(402)
     expect((await issueLicense(unpaid, post({ sessionId: 'otro' }))).status).toBe(400)
+  })
+
+  it('un id de sesión viejo ya no da licencia (si se filtra, no sirve)', async () => {
+    const d = deps()
+    ;(d.stripe.checkout.sessions.retrieve as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      status: 'complete',
+      customer: 'cus_1',
+      created: NOW / 1000 - 4 * 86400,
+    })
+    expect((await issueLicense(d, post({ sessionId: 'cs_viejo' }))).status).toBe(410)
+  })
+
+  it('rechaza productos desconocidos', async () => {
+    expect((await createCheckout(deps(), post({ acceptedTerms: true, product: 'gratis-para-siempre' }))).status).toBe(400)
+    expect((await createCheckout(deps(), post({ acceptedTerms: true, product: { $ne: 1 } }))).status).toBe(400)
   })
 
   it('portal sólo con comprobante válido', async () => {

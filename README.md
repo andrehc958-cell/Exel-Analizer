@@ -82,6 +82,24 @@ procesamiento en servidor (lotes, API), el mismo motor puede correr en Node.
 - Los ceros a la izquierda (códigos postales, claves) se conservan como texto.
 - Las fechas ambiguas y las conversiones de tipo nunca se aplican sin una decisión explícita.
 - Los valores que no se pueden convertir se dejan intactos y se reportan.
+- **Bombas ZIP**: antes de abrir un .xlsx se lee su directorio central y se rechaza si declara más de
+  800 MB descomprimidos, más de 5 000 partes, una tasa de compresión anormal, ZIP64 o cifrado (`zipguard.ts`).
+- **Concurrencia**: el Web Worker atiende las peticiones en cola, una a la vez.
+
+### Protección del sitio y de la API
+
+- **Cabeceras** (`vercel.json`): CSP sin JavaScript ni estilos en línea, HSTS, `X-Frame-Options`, `nosniff`,
+  Referrer-Policy, Permissions-Policy y COOP. `npm run preview` aplica las mismas cabeceras para probarlas.
+  El iframe de anuncios (`/anuncio.html`) tiene su propia CSP, más abierta, y corre aislado con `sandbox`.
+- **Endpoints `/api`** (`server/guard.ts`): sólo POST con JSON, desde el mismo sitio (cabecera Origin),
+  cuerpos de hasta 16 KB y un límite de solicitudes por IP (contacto: 5 cada 10 min; checkout y portal: 10;
+  licencia: 30). El webhook de Stripe se autentica con su firma.
+- **Licencias**: el id de una sesión de Checkout sólo se canjea por la licencia durante 3 días; después
+  hace falta el comprobante firmado. Así un id filtrado no sirve para activar Pro en otro navegador.
+- **Dependencias**: CI corre `npm audit` sobre las dependencias de producción y Dependabot propone actualizaciones.
+- **Ataques de denegación de servicio**: el límite por IP vive en la memoria de cada función y frena abusos
+  simples, no un ataque distribuido. Para eso, activar en Vercel → Firewall una regla de rate limiting para
+  `/api/*` y, con dominio propio, poner Cloudflare (plan gratuito, modo proxy) delante del sitio.
 
 ## Pagos con Stripe
 

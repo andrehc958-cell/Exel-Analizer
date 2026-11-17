@@ -21,6 +21,9 @@ export interface BillingDeps {
 
 const ACTIVE = new Set(['active', 'trialing'])
 
+/** Tiempo para canjear el id de una sesión de Checkout por una licencia de suscripción. */
+export const SESSION_CLAIM_SECONDS = 3 * 24 * 60 * 60
+
 /** Duración del pase de pago único, contada desde la compra. */
 export const PASS_SECONDS = 24 * 60 * 60
 
@@ -43,7 +46,7 @@ export async function createCheckout({ stripe, env }: BillingDeps, request: Requ
   if (body?.acceptedTerms !== true) {
     return json({ error: 'Debes aceptar los Términos y el Aviso de privacidad.' }, 400)
   }
-  const product = (body.product ?? 'monthly') as CheckoutProduct
+  const product = body.product ?? 'monthly'
   const acceptedAt = { accepted_terms_at: new Date().toISOString() }
   const common = {
     success_url: `${env.appUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}#/precios`,
@@ -97,6 +100,11 @@ export async function issueLicense(deps: BillingDeps, request: Request): Promise
   if (typeof body?.sessionId === 'string' && body.sessionId.startsWith('cs_')) {
     const session = await stripe.checkout.sessions.retrieve(body.sessionId)
     if (session.mode === 'payment') return issuePass(session, env, nowSec)
+    // El id de sesión sólo sirve para activar la compra recién hecha. Si se filtrara después
+    // (historial, capturas, soporte), no debe bastar para obtener la licencia de otra persona.
+    if (session.created + SESSION_CLAIM_SECONDS < nowSec) {
+      return json({ error: 'Este enlace de pago ya caducó. Escríbenos desde Servicio al cliente para recuperar tu plan.' }, 410)
+    }
     if (session.status !== 'complete' || typeof session.customer !== 'string') {
       return json({ error: 'El pago no se ha completado.' }, 402)
     }
