@@ -103,7 +103,7 @@ procesamiento en servidor (lotes, API), el mismo motor puede correr en Node.
 
 ## Pagos con Stripe
 
-Planes: **Gratis** (archivos de hasta 5 MB y 20 000 filas) y **Pro** (suscripción mensual, hasta 50 MB y 500 000 filas).
+Planes: **Gratis** (archivos de hasta 5 MB y 10 000 filas) y **Pro** (suscripción mensual, hasta 50 MB y 500 000 filas).
 Los límites están en `src/billing/plan.ts`; el precio se define en Stripe.
 
 No hay base de datos ni cuentas: Stripe es la fuente de verdad. Tras pagar, el servidor consulta
