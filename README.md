@@ -116,7 +116,7 @@ En Vercel basta con menos: la integración de Stripe crea la clave con prefijo (
 usa tal cual; `APP_URL` toma el dominio de producción del proyecto, y si falta `LICENSE_SECRET` se deriva uno
 de la clave de Stripe (al rotar esa clave los clientes tendrán que restaurar su licencia). Lo mínimo es
 `VITE_BILLING_ENABLED=true`: sin `STRIPE_PRICE_PRO` se cobra el precio por defecto de
-`server/billing.ts` ($199 MXN al mes, producto «DataClean Pro»).
+`server/billing.ts` ($99 MXN al mes, producto «DataClean Pro»).
 
 Mientras `VITE_BILLING_ENABLED` no sea `true`, la aplicación funciona sin límites de plan y sin pagos.
 **Las claves de Stripe nunca deben subirse al repositorio.**
@@ -130,7 +130,7 @@ Todas son opcionales y se activan con variables de entorno (ver `.env.example`).
 
 | Fuente | Cómo funciona | Variables |
 | --- | --- | --- |
-| **Plan Pro anual** | Suscripción anual con descuento (sugerido: $1,990 MXN, 2 meses gratis). Mismo flujo y portal que el mensual. | `STRIPE_PRICE_PRO_ANNUAL`, `VITE_PRO_ANNUAL_PRICE_LABEL`, `VITE_PRO_ANNUAL_NOTE` |
+| **Plan Pro anual** | Suscripción anual con descuento (sugerido: $990 MXN, 2 meses gratis). Mismo flujo y portal que el mensual. | `STRIPE_PRICE_PRO_ANNUAL`, `VITE_PRO_ANNUAL_PRICE_LABEL`, `VITE_PRO_ANNUAL_NOTE` |
 | **Pase de 24 horas** | Pago único (sugerido: $49 MXN) para quien sólo necesita limpiar un archivo grande. Da Pro durante 24 h desde la compra y no se renueva. | `STRIPE_PRICE_PASS`, `VITE_PASS_PRICE_LABEL` |
 | **Donaciones** | Botón «Invítanos un café» en Planes, en el pie y en el aviso del plan gratuito. Usa un [Payment Link](https://dashboard.stripe.com/payment-links) de Stripe con «el cliente elige el monto»; no necesita código de servidor. | `VITE_DONATION_URL` |
 | **Anuncios** | Google AdSense, sólo para el plan gratuito y sólo tras aceptar en el aviso de consentimiento. Pro y pase no ven anuncios. | `VITE_ADSENSE_CLIENT`, `VITE_ADSENSE_SLOT` |

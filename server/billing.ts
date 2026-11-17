@@ -27,10 +27,10 @@ export const PASS_SECONDS = 24 * 60 * 60
 /** Marca en los metadatos de Checkout: sólo estas sesiones de pago único activan un pase (no las donaciones). */
 const PASS_METADATA = { product: 'pass' }
 
-/** Precio mensual por defecto ($199 MXN), coincide con la etiqueta por defecto de la página de precios. */
+/** Precio mensual por defecto ($99 MXN), coincide con la etiqueta por defecto de la página de precios. */
 export const DEFAULT_PRO_PRICE: Stripe.Checkout.SessionCreateParams.LineItem.PriceData = {
   currency: 'mxn',
-  unit_amount: 19900,
+  unit_amount: 9900,
   recurring: { interval: 'month' },
   product_data: { name: 'DataClean Pro' },
 }
